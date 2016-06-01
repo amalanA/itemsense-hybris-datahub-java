@@ -1,0 +1,12 @@
+<Context antiJARLocking="true"
+         docBase="<Path-To-Hybris-Install>/bin/ext-integration/datahub/web-app/datahub-webapp-5.7.0.2-RC1.war"
+         reloadable="true">
+    <Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+            virtualClasspath=
+                "<Path-To-Data-Hub-Tomcat-Install>/lib/;
+                 <Path-To-MySQL-Jar(if needed>/mysql-connector-java-5.1.18.jar;               
+                 <Path-To-Impinj-Install>/impinj-raw/target/*.jar;
+                 <Path-To-Impinj-Install>/impinj-canonical/target/*.jar;
+                 <Path-To-Impinj-Install>/impinj-target/target/*.jar;
+                 " />
+</Context>
