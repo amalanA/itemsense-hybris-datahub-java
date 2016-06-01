@@ -1,0 +1,77 @@
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2015 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+<extension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.hybris.com/schema/"
+		   xsi:schemaLocation="http://www.hybris.com/schema/ http://www.hybris.com/schema/datahub-metadata-schema-1.2.0.xsd"
+		   name="impinj-raw">
+
+	<dependencies>
+		<dependency>
+			<extension>impinj-canonical</extension>
+		</dependency>
+	</dependencies>
+	
+	<rawItems>
+		<item>
+			<type>RawImpinjStockItem</type>
+			<description>Raw representation of an Impinj stock raw item</description>
+			<attributes>
+				<attribute>
+					<name>productId</name>
+				</attribute>
+				<attribute>
+					<name>stockLevel</name>
+				</attribute>
+				<attribute>
+					<name>warehouseId</name>
+				</attribute>
+			</attributes>
+		</item>
+	</rawItems>
+	
+	<canonicalItems>
+		<item>
+			<type>CanonicalImpinjStockItem</type>
+			<description>Canonical representation of Impinj stock item</description>
+			<status>ACTIVE</status>
+			<attributes>
+				<attribute>
+					<name>productId</name>
+					<transformations>
+						<transformation>
+							<rawSource>RawImpinjStockItem</rawSource>
+							<expression>productId</expression>
+						</transformation>
+					</transformations>
+				</attribute>
+				<attribute>
+					<name>stockLevel</name>
+					<transformations>
+						<transformation>
+							<rawSource>RawImpinjStockItem</rawSource>
+							<expression>stockLevel</expression>
+						</transformation>
+					</transformations>
+				</attribute>
+				<attribute>
+					<name>warehouseId</name>
+					<transformations>
+						<transformation>
+							<rawSource>RawImpinjStockItem</rawSource>
+							<expression>warehouseId</expression>
+						</transformation>
+					</transformations>
+				</attribute>
+			</attributes>
+		</item>
+	</canonicalItems>
+
+</extension>
