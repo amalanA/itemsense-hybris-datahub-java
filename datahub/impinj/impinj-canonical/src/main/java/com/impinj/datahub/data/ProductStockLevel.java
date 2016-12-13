@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -106,22 +107,50 @@ public class ProductStockLevel {
 
     public static HashMap<String, Integer> getMasterDataStockLevelsFromItems(String masterDataFile, Collection<Item> items, String epcPrefix, Integer lookbackWindowInSeconds ) {
 
-		LOGGER.debug ("ItemSense items : " + items);
-	LOGGER.debug ("getMasterDataStockLevelsFromItems: epcPrefix: " + epcPrefix);
+        LOGGER.debug ("getMasterDataStockLevelsFromItems:  UNFILTERED ItemSense item Count : " + items.size());
+        LOGGER.debug ("UNFILTERED ItemSense items: " + items);
         if(epcPrefix != null && !epcPrefix.isEmpty()){
-		LOGGER.debug ("---filtering for epcPrefix: " + epcPrefix);
-		LOGGER.debug ("---prefiltered item count : " + items.size());
+            LOGGER.debug ("+++ filtering for epcPrefix: " + epcPrefix);
+            LOGGER.debug ("+++ pre epcPrefix filtered item count : " + items.size());
             items = items.stream().filter(i-> i.getEpc().startsWith(epcPrefix)).collect(Collectors.toList());
-		LOGGER.debug ("---filtered item count : " + items.size());
+            LOGGER.debug ("--- filtered item count : " + items.size());
+        } else {
+            LOGGER.debug ("--- epcPrefix not set: " + epcPrefix);
         }
-	LOGGER.debug ("getMasterDataStockLevelsFromItems: lookbackwindowinseconts: " + lookbackWindowInSeconds);
+
         if(lookbackWindowInSeconds != null && lookbackWindowInSeconds.intValue() > 0){
-		LOGGER.debug("---filtering for lookbackwindowinseconts: " + lookbackWindowInSeconds);
-		LOGGER.debug ("---prefiltered item count : " + items.size());
+            LOGGER.debug("+++ filtering for lookbackwindowinseconds: " + lookbackWindowInSeconds);
+            LOGGER.debug ("+++ pre lookback seconds filtered  item count : " + items.size());
             items = items.stream().filter(i-> ChronoUnit.SECONDS.between(ZonedDateTime.parse(i.getLastModifiedTime()), ZonedDateTime.now()) < lookbackWindowInSeconds.longValue()).collect(Collectors.toList());
-		LOGGER.debug ("---filtered item count : " + items.size());
+            LOGGER.debug ("--- filtered item count : " + items.size());
+        } else {
+            LOGGER.debug ("--- lookbackwindowinseconds not set: " + lookbackWindowInSeconds);
         }
-        return getMasterDataStockLevels(masterDataFile, getItemSenseProductStockLevels(items));
+
+
+        LOGGER.debug("++++++++++++++++ DEMO ONLY!!!   filtering out zone:  ABSENT");
+        LOGGER.debug ("+++ pre ABSENT ZONE filtered item count : " + items.size());
+	
+
+	ArrayList<Item> filteredItems = new ArrayList<Item> ();
+        items.forEach(item-> { 
+            System.out.println("Item: epc: " + item.getEpc() + " Zone: " + item.getZone() ); 
+            if (item.getZone().equals("ABSENT")) {
+            	 System.out.println("ABSENT Item: epc: " + item.getEpc() + " Zone: " + item.getZone() ); 
+            } else {
+                System.out.println("KEEPER Item: epc: " + item.getEpc() + " Zone: " + item.getZone() ); 
+                filteredItems.add(item);
+            }
+        } );
+
+   
+        //items = items.stream().filter(i-> (!"ABSENT".equals(i.getZone()))).collect(Collectors.toList());
+        
+
+        LOGGER.debug ("--- filtered item count : " + filteredItems.size());
+
+
+        return getMasterDataStockLevels(masterDataFile, getItemSenseProductStockLevels(filteredItems));
     }
 
     @Override

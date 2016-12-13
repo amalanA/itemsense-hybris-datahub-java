@@ -65,7 +65,8 @@ public class MasterData {
 			}
 			finally { }
 		}
-	
+
+		LOGGER.info("Initializing master data. Found " + productMasterData.size() + " product codes in MasterData File: " + masterDataFile);
 		return productMasterData;
 	}
 }
