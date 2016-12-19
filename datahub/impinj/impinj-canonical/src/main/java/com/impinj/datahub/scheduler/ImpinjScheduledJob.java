@@ -93,7 +93,8 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 		ZonedDateTime toTime = TimeHelper.getNowUTC ();
 		ZonedDateTime fromTime = TimeHelper.getFromTimeByLookbackWindow (toTime, lookbackWindowInSeconds);
 
-		final Collection<Item> items = ItemSenseQueryHelper.getFilteredItems (getItemSenseConnection (),
+		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
+		final Collection<Item> items = isQueryHelper.getFilteredItems (getItemSenseConnection (),
 				null, facility, zones, epcPrefix, fromTime, toTime);
 		LOGGER.info("ItemSense (filtered) reported item count: " + items.size());
 
