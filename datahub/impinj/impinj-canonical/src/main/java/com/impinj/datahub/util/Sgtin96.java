@@ -1,4 +1,4 @@
-package com.impinj.datahub.itemsense;
+package com.impinj.datahub.util;
 
 
 import java.math.BigInteger;

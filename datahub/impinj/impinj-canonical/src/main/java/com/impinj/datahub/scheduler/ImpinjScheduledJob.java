@@ -1,17 +1,16 @@
 package com.impinj.datahub.scheduler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.io.IOException;
 
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.JobKey;
+import com.hybris.datahub.dto.integration.RawFragmentData;
+
+import com.impinj.datahub.util.TimeHelper;
+import com.impinj.itemsense.client.data.item.Item;
+import com.impinj.datahub.itemsense.ItemSenseJobHelper;
+import com.impinj.datahub.itemsense.ItemSenseQueryHelper;
+import com.impinj.datahub.itemsense.ItemSenseConnection;
+import com.impinj.datahub.constants.ImpinjDatahubConstants;
+import com.impinj.datahub.data.ProductStockLevel;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -21,15 +20,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 
-import com.hybris.datahub.dto.integration.RawFragmentData;
-import com.impinj.datahub.config.ImpinjConfiguration;
-import com.impinj.datahub.constants.ImpinjDatahubConstants;
-import com.impinj.datahub.itemsense.ItemSenseApiFactory;
-import com.impinj.datahub.itemsense.ItemSenseConfiguration;
-import com.impinj.itemsense.client.Item;
-import com.impinj.itemsense.client.ItemApiLib;
-import com.impinj.itemsense.client.ControlApiLib;
-import com.impinj.datahub.data.ProductStockLevel;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 /**
  * Job that creates a connection between impinj and retrieves stock information.
@@ -38,9 +30,7 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 {
 	private static ApplicationContext applicationContext;
 	private MessageChannel rawFragmentDataInputChannel;
-	private ItemSenseConfiguration itemsenseConfiguration;
-	private ItemApiLib itemApiLib;
-	private ControlApiLib controlApiLib;
+	private ItemSenseConnection itemSenseConnection;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImpinjScheduledJob.class);
 
@@ -61,22 +51,19 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 
 		LOGGER.info("Impinj Data Hub job is running: Job " + jobKey.getName());
 
-		setItemsenseConfiguration(ImpinjConfiguration.getConfiguration(
+		setItemSenseConnection( new ItemSenseConnection (
 				dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL),
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME), dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD)));
-		setControlApiLib(ItemSenseApiFactory.getControlApiLib(getItemsenseConfiguration()));
+				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME),
+				dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD)));
 
 		// validate a job is running.  If not, log as a warning and do not update any data
-		try {
-			if (!getControlApiLib().anyJobIsRunning())
-			{
-				LOGGER.info("No ItemSense Job is running for URL: " + getItemsenseConfiguration().getBaseUrl() + ".  Please schedule/run a job" );
+
+			if (ItemSenseJobHelper.isJobRunning (getItemSenseConnection (), dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY) )) {
+				LOGGER.info("No ItemSense Job is running for URL: " + getItemSenseConnection().getBaseUrl() + " facility: "
+						+ dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY)  + ".  Please schedule/run a job" );
 			}
 			else
 			{
-				// Job is active, get ItemSense item Api Client
-				setItemApiLib(ItemSenseApiFactory.getItemApiLib(getItemsenseConfiguration()));
-	
 				if (rawFragmentDataInputChannel == null)
 				{
 					rawFragmentDataInputChannel = (MessageChannel) SpringContext.getApplicationContext().getBean(
@@ -86,37 +73,32 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 						ImpinjDatahubConstants.DATAHUB_IMPINJ_RAW_ITEM_TYPE, dataMap.getString(ImpinjDatahubConstants.CONFIG_WAREHOUSE),
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_MASTER_DATA_FILE),
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_EPC_PREFIX),
-						dataMap.getIntFromString(ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS));
+						dataMap.getLongFromString(ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS),
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY),
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES)
+						);
 				rawFragmentDataInputChannel.send(new GenericMessage(rawData));
 			}
-		} 
-		catch (final IOException e)
-		{
-		    LOGGER.error("Error querying for for an active job.  ItemSense configuration: " + getItemsenseConfiguration() + " exception: " + e);
-
-		}
-
 	}
 
 	/**
 	 * Connects to itemsense to retrieve data and convert it to Raw.
-	 *
-	 * @param context the jobExecutionContext from Quartz
-	 * @param feedNxame
-	 * @param type
-	 * @return
 	 */
 	protected List<RawFragmentData> createRawDataFromImpinj(final String feedName, final String type, final String warehouse,
-			final String hybrisMasterDataFile, final String epcPrefix, final int lookbackWindowInSeconds)
+			final String hybrisMasterDataFile, final String epcPrefix, final long lookbackWindowInSeconds,
+            final String facility, final String zones)
 	{
 		final List<RawFragmentData> result = new ArrayList<>();
 		RawFragmentData rawFragmentData;
+		ZonedDateTime toTime = TimeHelper.getNowUTC ();
+		ZonedDateTime fromTime = TimeHelper.getFromTimeByLookbackWindow (toTime, lookbackWindowInSeconds);
 
-		final Collection<Item> items = getItemApiLib().showAllItems(/* ImpinjDatahubConstants.EPC_FORMAT */"");
-		LOGGER.info("ItemSense reported item count: " + items.size());
+		final Collection<Item> items = ItemSenseQueryHelper.getFilteredItems (getItemSenseConnection (),
+				null, facility, zones, epcPrefix, fromTime, toTime);
+		LOGGER.info("ItemSense (filtered) reported item count: " + items.size());
 
 		final HashMap<String, Integer> hybrisInventoryCount = ProductStockLevel.getMasterDataStockLevelsFromItems(
-				hybrisMasterDataFile, items, epcPrefix, lookbackWindowInSeconds);
+				hybrisMasterDataFile, items);
 
 		for (final Map.Entry<String, Integer> item : hybrisInventoryCount.entrySet())
 		{
@@ -154,47 +136,16 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	/**
 	 * @return the itemsenseConfiguration
 	 */
-	public ItemSenseConfiguration getItemsenseConfiguration()
+	public ItemSenseConnection getItemSenseConnection()
 	{
-		return itemsenseConfiguration;
+		return itemSenseConnection;
 	}
 
 	/**
-	 * @param itemsenseConfiguration the itemsenseConfiguration to set
+	 * @param itemSenseConnection the itemsenseConfiguration to set
 	 */
-	public void setItemsenseConfiguration(final ItemSenseConfiguration itemsenseConfiguration)
+	public void setItemSenseConnection(final ItemSenseConnection itemSenseConnection)
 	{
-		this.itemsenseConfiguration = itemsenseConfiguration;
-	}
-
-	/**
-	 * @return the controlApiLib
-	 */
-	public ControlApiLib getControlApiLib()
-	{
-		return controlApiLib;
-	}
-
-	/**
-	 * @param controlApiLib the controlApiLib to set
-	 */
-	public void setControlApiLib(final ControlApiLib controlApiLib)
-	{
-		this.controlApiLib = controlApiLib;
-	}
-	/**
-	 * @return the itemApiLib
-	 */
-	public ItemApiLib getItemApiLib()
-	{
-		return itemApiLib;
-	}
-
-	/**
-	 * @param itemApiLib the itemApiLib to set
-	 */
-	public void setItemApiLib(final ItemApiLib itemApiLib)
-	{
-		this.itemApiLib = itemApiLib;
+		this.itemSenseConnection = itemSenseConnection;
 	}
 }

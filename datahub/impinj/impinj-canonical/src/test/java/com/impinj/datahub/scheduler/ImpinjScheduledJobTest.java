@@ -7,14 +7,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
+import com.impinj.datahub.itemsense.ItemSenseConnection;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.hybris.datahub.dto.integration.RawFragmentData;
 import com.impinj.datahub.config.DynamicConfig;
-import com.impinj.datahub.config.ImpinjConfiguration;
 import com.impinj.datahub.constants.ImpinjDatahubConstants;
-import com.impinj.datahub.itemsense.ItemSenseApiFactory;
 
 public class ImpinjScheduledJobTest
 {
@@ -30,11 +29,10 @@ public class ImpinjScheduledJobTest
 			assertTrue(Integer.parseInt(config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS)) >= 1);
 
 			impinjJob = new ImpinjScheduledJob();
-			impinjJob.setItemsenseConfiguration(ImpinjConfiguration.getConfiguration(
+			impinjJob.setItemSenseConnection ( new ItemSenseConnection (
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ENDPOINT_URL),
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_USERNAME),
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_PASSWORD)));
-			impinjJob.setItemApiLib(ItemSenseApiFactory.getItemApiLib(impinjJob.getItemsenseConfiguration()));
 
 		}
 		catch (final IOException e)
@@ -60,8 +58,9 @@ public class ImpinjScheduledJobTest
 					warehouse,
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_MASTER_DATA_FILE),
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_EPC_PREFIX),
-					Integer.parseInt(config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1."
-							+ ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS)));
+					Integer.parseInt(config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS)),
+					config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_FACILITY),
+					config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ZONES) );
 			assertNotNull(rawItems);
 
 			// could eventually get zero items from itemsense.

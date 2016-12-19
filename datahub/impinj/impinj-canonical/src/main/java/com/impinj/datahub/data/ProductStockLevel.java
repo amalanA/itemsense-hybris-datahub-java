@@ -1,11 +1,10 @@
 package com.impinj.datahub.data;
 
-import com.impinj.datahub.itemsense.Sgtin96;
-import com.impinj.itemsense.client.Item;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
+import com.impinj.datahub.util.Sgtin96;
+import com.impinj.itemsense.client.data.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -49,13 +48,22 @@ public class ProductStockLevel {
      * @param items items read by itemsense client
      */
     public static List<ProductStockLevel> getItemSenseProductStockLevels(Collection<Item> items) {
-        List<Sgtin96> productInfos = items.stream().map(i -> Sgtin96.FromSgtin96Epc(i.getEpc())).filter(sgtin96 -> sgtin96 != null).collect(Collectors.toList());
+        List<Sgtin96> productSgtins = items
+                .stream()
+                .map(i -> Sgtin96.FromSgtin96Epc(i.getEpc()))
+                .filter(sgtin96 -> sgtin96 != null)
+                .collect(Collectors.toList());
 
 		LOGGER.debug("getItemSenseProductStockLevels-- items size: " + items.size());
 		LOGGER.debug("getItemSenseProductStockLevels-- items: " + items);
-        return productInfos.stream().collect(Collectors.groupingBy(p -> p.toEAN(), Collectors.counting()))
-                .entrySet().stream().map((m) -> new ProductStockLevel(m.getKey(), m.getValue().intValue()))
+        List<ProductStockLevel> productStockLevels = productSgtins
+                .stream()
+                .collect(Collectors.groupingBy(p -> p.toEAN(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .map((m) -> new ProductStockLevel(m.getKey(), m.getValue().intValue()))
                 .collect((Collectors.toList()));
+        return productStockLevels;
 
     }
 
@@ -70,10 +78,14 @@ public class ProductStockLevel {
         HashMap<String, Integer> masterDataStockLevels = new HashMap<String, Integer>();
         HashMap<String, String> masterDataInfo = MasterData.loadProductMasterData(masterDataFile);
 
+        // load 0 quantity for each product
         masterDataInfo.values().stream().forEach(productCode -> masterDataStockLevels.put(productCode, 0));
 	LOGGER.info("Number of Master Data product codes: " + masterDataInfo.size());
 
-        currentLevels.stream().filter(p -> masterDataInfo.containsKey(p.getEan())).forEach(p -> masterDataStockLevels.put(masterDataInfo.get(p.getEan()), p.getQuantity()));
+        currentLevels
+                .stream()
+                .filter(p -> masterDataInfo.containsKey(p.getEan()))
+                .forEach(p -> masterDataStockLevels.put(masterDataInfo.get(p.getEan()), p.getQuantity()));
 
 		LOGGER.debug("--- currentStockLevels size: " + currentLevels.size());
 		LOGGER.debug("--- currentStockLevels: " + currentLevels);
@@ -90,38 +102,7 @@ public class ProductStockLevel {
      * @param items          items returned by ItemSense client
      */
     public static HashMap<String, Integer> getMasterDataStockLevelsFromItems(String masterDataFile, Collection<Item> items) {
-        return getMasterDataStockLevelsFromItems(masterDataFile, items, null, null);
-    }
-
-    /** 
-     * gets stock levels with filters
-     *
-     * @param masterDataFile path to master data file
-     * @param items          items returned by ItemSense client
-     * @param epcPrefix      filter by EPC prefix (configured in data hub job)
-     * @param lookbackWindowInSeconds      filter by last updated time on items (configured in data hub job).  Filters out
-     *                       items not updated in itemsense in the number of seconds.  must be greater than the 
-     *                       frequency in ItemSense
-     */
-
-    public static HashMap<String, Integer> getMasterDataStockLevelsFromItems(String masterDataFile, Collection<Item> items, String epcPrefix, Integer lookbackWindowInSeconds ) {
-
-		LOGGER.debug ("ItemSense items : " + items);
-	LOGGER.debug ("getMasterDataStockLevelsFromItems: epcPrefix: " + epcPrefix);
-        if(epcPrefix != null && !epcPrefix.isEmpty()){
-		LOGGER.debug ("---filtering for epcPrefix: " + epcPrefix);
-		LOGGER.debug ("---prefiltered item count : " + items.size());
-            items = items.stream().filter(i-> i.getEpc().startsWith(epcPrefix)).collect(Collectors.toList());
-		LOGGER.debug ("---filtered item count : " + items.size());
-        }
-	LOGGER.debug ("getMasterDataStockLevelsFromItems: lookbackwindowinseconts: " + lookbackWindowInSeconds);
-        if(lookbackWindowInSeconds != null && lookbackWindowInSeconds.intValue() > 0){
-		LOGGER.debug("---filtering for lookbackwindowinseconts: " + lookbackWindowInSeconds);
-		LOGGER.debug ("---prefiltered item count : " + items.size());
-            items = items.stream().filter(i-> ChronoUnit.SECONDS.between(ZonedDateTime.parse(i.getLastModifiedTime()), ZonedDateTime.now()) < lookbackWindowInSeconds.longValue()).collect(Collectors.toList());
-		LOGGER.debug ("---filtered item count : " + items.size());
-        }
-        return getMasterDataStockLevels(masterDataFile, getItemSenseProductStockLevels(items));
+	    return getMasterDataStockLevels(masterDataFile, getItemSenseProductStockLevels(items));
     }
 
     @Override

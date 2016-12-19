@@ -18,6 +18,9 @@ public class ImpinjDatahubConstants
 	public final static String CONFIG_MASTER_DATA_FILE = "hybrismasterdatapath";
 	public final static String CONFIG_LOOKBACK_WINDOW_IN_SECONDS = "itemlookbackwindowinseconds";
 	public final static String CONFIG_EPC_PREFIX = "epcprefix";
+	public final static String CONFIG_FACILITY = "facility";
+	public final static String CONFIG_ZONES = "zones";
+
 	/**
 	 * Datahub constants.
 	 */
@@ -36,9 +39,16 @@ public class ImpinjDatahubConstants
 	public static final String RAW_FRAGMENT_DATA_INPUT_CHANNEL = "rawFragmentDataInputChannel";
 
 	/**
-	 * Impinj constants.
+	 * Impinj ItemSense constants.
 	 */
 	public static final String EPC_FORMAT = "PURE_ID";
+    public static final String JOB_STATUS_RUNNING = "RUNNING";
+
+	/**
+	 * General constants
+	 */
+	public static final String COMMA_DELIMITER = ",";
+	public static final String PIPE_DELIMITER = "|";
 	/**
 	 * Instantiates a new Impinj DataHub constants.
 	 */

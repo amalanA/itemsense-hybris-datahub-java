@@ -66,7 +66,16 @@ public class ImpinjSchedulerFactoryBean extends SchedulerFactoryBean
 							.usingJobData(
 									ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS,
 									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
-											+ ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS)).build();
+											+ ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_FACILITY,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_FACILITY))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_ZONES,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_ZONES))
+							.build();
 
 					final Trigger trigger = TriggerBuilder
 							.newTrigger()

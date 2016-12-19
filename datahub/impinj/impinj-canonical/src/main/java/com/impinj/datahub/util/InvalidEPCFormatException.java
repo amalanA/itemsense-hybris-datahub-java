@@ -1,4 +1,4 @@
-package com.impinj.datahub.itemsense;
+package com.impinj.datahub.util;
 
 /**
  * Created by jcombopi on 1/12/16.

@@ -47,7 +47,7 @@ public class ScheduledJobTest implements Job, ApplicationContextAware
 	@Override
 	public void execute(final JobExecutionContext context) throws JobExecutionException
 	{
-		LOGGER.debug("Job test is runing " + context.getJobDetail().getKey().getName());
+		LOGGER.warn ("Job test is runing " + context.getJobDetail().getKey().getName());
 
 		if (rawFragmentDataInputChannel == null)
 		{
