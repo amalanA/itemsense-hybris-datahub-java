@@ -16,7 +16,7 @@ public class ItemSenseJobHelper {
 	public ItemSenseJobHelper() {
 	}
 
-	public static boolean isJobRunning(ItemSenseConnection itemSenseConnection, String facility) {
+	public boolean isJobRunning(ItemSenseConnection itemSenseConnection, String facility) {
 
 //		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ()
 //				.stream ()
@@ -26,11 +26,14 @@ public class ItemSenseJobHelper {
 		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ();
 
 		if (jobResponseList == null || jobResponseList.size () == 0) {
+			LOGGER.debug("No jobs in jobResponseList");
 			return false;
 		}
 
 		for (JobResponse jr : jobResponseList) {
-		    if (jr.getStatus ().equals (JobStatus.RUNNING)) {
+                    LOGGER.debug("jobResponse: " + jr);
+		    if (jr.getJobStatusAsEnum().equals (JobStatus.RUNNING)) {
+                           	LOGGER.debug("jobResponse: found Running Job");
 			    if (facility == null || facility.trim ().length () == 0) {
 				    // no facility specified then any job running will suffice...
 				    return true;
@@ -42,7 +45,9 @@ public class ItemSenseJobHelper {
 				    }
 			    }
 
-		    }
+		    } else {
+                           	LOGGER.debug("jobResponse.status: " + jr.getStatus() + " NE RUNNING");
+	            }
 		}
 
 		// Nothing matched so a job must not be running in the correct facility...
