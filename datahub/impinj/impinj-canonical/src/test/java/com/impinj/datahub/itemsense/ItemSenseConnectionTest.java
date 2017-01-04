@@ -49,9 +49,6 @@ public class ItemSenseConnectionTest
 	@Test
 	public void getConnectionCoordinatorControllerTest() {
 
-	    System.out.println ("ItemSenseConnection CAC test : url: " + url);
-	    System.out.println ("ItemSenseConnection CAC test : userName: " + userName);
-	    System.out.println ("ItemSenseConnection CAC test : password: " + password);
 	    ItemSenseConnection isConnection = new ItemSenseConnection ( url, userName, password);
 
 
@@ -60,19 +57,14 @@ public class ItemSenseConnectionTest
 	    assertTrue ("coordinator api controller", cac!=null);
 
             // do something before job - 
-	    List <ReaderStatus> readerStatusList = cac.getHealthController().getAllReaderStatuses();
-	    assertNotNull ("ReaderStatusList", readerStatusList);
+	    //List <ReaderStatus> readerStatusList = cac.getHealthController().getAllReaderStatuses();
+	    //assertNotNull ("ReaderStatusList", readerStatusList);
 	    // and finally do something with the conroller
 		
 	    JobController jobController = cac.getJobController();
 	    assertNotNull ("job controller", jobController);
 	    Response jobsAsResponse = jobController.getJobsAsResponse();
 	    assertNotNull ("jobAsResponse", jobsAsResponse);
-	    System.out.println ("jobAsResponse" + jobsAsResponse);
-	    //System.out.println ("jobAsResponse" + jobsAsResponse.readEntity(String.class));
-
-	    List <JobResponse> jobStrings = jobsAsResponse.readEntity(new GenericType<List<JobResponse>>() {} );
-
 
             List <JobResponse> jobResponseList = jobController.getJobs();
 	    assertNotNull ("jobResponseList", jobResponseList);
@@ -83,9 +75,6 @@ public class ItemSenseConnectionTest
 	@Test
 	public void getConnectionDataControllerTest() {
 
-	    System.out.println ("ItemSenseConnection DAC test : url: " + url);
-	    System.out.println ("ItemSenseConnection DAC test : userName: " + userName);
-	    System.out.println ("ItemSenseConnection DAC test : password: " + password);
 		ItemSenseConnection isConnection = new ItemSenseConnection ( url, userName, password);
 
 
