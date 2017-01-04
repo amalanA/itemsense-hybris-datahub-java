@@ -58,7 +58,7 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 
 		// validate a job is running.  If not, log as a warning and do not update any data
 
-			if (ItemSenseJobHelper.isJobRunning (getItemSenseConnection (), dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY) )) {
+			if (!ItemSenseJobHelper.isJobRunning (getItemSenseConnection (), dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY) )) {
 				LOGGER.info("No ItemSense Job is running for URL: " + getItemSenseConnection().getBaseUrl() + " facility: "
 						+ dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY)  + ".  Please schedule/run a job" );
 			}

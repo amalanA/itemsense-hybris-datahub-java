@@ -52,15 +52,31 @@ public class ImpinjScheduledJobTest
 			final String feedName = "feed_test";
 			final String type = "type_test";
 			final String warehouse = "warehouse_test";
+
+			final String masterDataFile = config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_MASTER_DATA_FILE);
+			final String epcPrefixes = config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_EPC_PREFIX);
+			final String lookbackWindowInSeconds = config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS);
+			final String facility = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_FACILITY);
+		        final String zones = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ZONES);
+
+
+System.out.println ("test rawItems: feedname: " + feedName);
+System.out.println ("test rawItems: type: " + type);
+System.out.println ("test rawItems: warehouse: " + warehouse);
+System.out.println ("test rawItems: masterDataFile: " + masterDataFile);
+System.out.println ("test rawItems: epcPrefixes: " + epcPrefixes);
+System.out.println ("test rawItems: lookbackWindowInSeconds: " + lookbackWindowInSeconds);
+System.out.println ("test rawItems: facility: " + facility);
+System.out.println ("test rawItems: zones: " + zones);
 			rawItems = impinjJob.createRawDataFromImpinj(
 					feedName,
 					type,
 					warehouse,
-					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_MASTER_DATA_FILE),
-					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_EPC_PREFIX),
-					Integer.parseInt(config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS)),
-					config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_FACILITY),
-					config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ZONES) );
+					masterDataFile,
+					epcPrefixes,
+					Integer.parseInt(lookbackWindowInSeconds),
+					facility,
+					zones);
 			assertNotNull(rawItems);
 
 			// could eventually get zero items from itemsense.
