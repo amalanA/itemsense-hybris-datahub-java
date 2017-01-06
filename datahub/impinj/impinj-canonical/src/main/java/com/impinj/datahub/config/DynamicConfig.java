@@ -29,6 +29,7 @@ public class DynamicConfig
 		if (instance == null)
 		{
 			instance = new DynamicConfig();
+
 		}
 		return instance;
 	}
@@ -58,6 +59,7 @@ public class DynamicConfig
 				throw new FileNotFoundException("property file '" + ImpinjDatahubConstants.PROPERTIES_FILENAME + "' not found in the classpath");
 			}
 
+			LOGGER.debug("Getting property   key: " + key + " value: " + prop.getProperty(key));
 			return prop.getProperty(key);
 		}
 		catch (final Exception e)

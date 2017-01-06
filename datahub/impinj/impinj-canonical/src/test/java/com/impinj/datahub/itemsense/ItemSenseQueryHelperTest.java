@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -167,7 +168,7 @@ public class ItemSenseQueryHelperTest
 	public void filterItemsByFacilityTest()
 	{
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
-		ArrayList<Item>  filteredItems = isQueryHelper.filterItemsByFacility(items, null);
+		Collection<Item>  filteredItems = isQueryHelper.filterItemsByFacility(items, null);
 		assertTrue ("Null Facility test", items.size () == filteredItems.size ());
 
 		filteredItems = isQueryHelper.filterItemsByFacility (items, "DEFAULT");
@@ -184,7 +185,7 @@ public class ItemSenseQueryHelperTest
 	public void filterItemsByPrefixesTest()
 	{
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
-		ArrayList<Item>  filteredItems = isQueryHelper.filterItemsByPrefixes(items, null);
+		Collection<Item>  filteredItems = isQueryHelper.filterItemsByPrefixes(items, null);
 		assertTrue ("Null Prefix test", items.size () == filteredItems.size ());
 
 		filteredItems = isQueryHelper.filterItemsByPrefixes (items, "3014");
@@ -202,7 +203,7 @@ public class ItemSenseQueryHelperTest
 	public void filterItemsByTimeTest()
 	{
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
-		ArrayList<Item>  filteredItems = isQueryHelper.filterItemsByTime(items, null, null);
+		Collection<Item>  filteredItems = isQueryHelper.filterItemsByTime(items, null, null);
 		assertTrue ("Null Time test", items.size () == filteredItems.size ());
 
 		filteredItems = isQueryHelper.filterItemsByTime (items, testTime.minusSeconds (30), testTime);
@@ -223,7 +224,7 @@ public class ItemSenseQueryHelperTest
 	public void filterItemsByZonesTest()
 	{
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
-		ArrayList<Item>  filteredItems = isQueryHelper.filterItemsByZones(items, null);
+		Collection<Item>  filteredItems = isQueryHelper.filterItemsByZones(items, null);
 		assertTrue ("Null Zones test", items.size () == filteredItems.size ());
 
 		filteredItems = isQueryHelper.filterItemsByZones (items, "Zone1");

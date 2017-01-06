@@ -6,15 +6,17 @@ import com.impinj.itemsense.client.data.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import java.util.stream.Collectors;
 
 public class ItemSenseQueryHelper {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ItemSenseQueryHelper.class.getName());
-
 
 	public ItemSenseQueryHelper() {
 	}
@@ -34,7 +36,8 @@ public class ItemSenseQueryHelper {
 	 * @param fromTime
 	 * @param toTime
 	 * @return
-	 */
+	 * /
+  TODO - fix this!!
 	public ArrayList<Item> getFilteredItems(ItemSenseConnection itemSenseConnection,
 	              EpcFormat epcFormat, String facility, String zones, String epcPrefixes,
 	              ZonedDateTime fromTime, ZonedDateTime toTime ) {
@@ -42,18 +45,16 @@ public class ItemSenseQueryHelper {
 
 		ArrayList <Item> items = new ArrayList <> ();
 		ArrayList <String> epcPrefixList = StringHelper.parseCommaDelimitedStringToList (epcPrefixes);
-		if (epcPrefixList == null) {
-			items = itemSenseConnection
-					.getDataController()
-					.getItemController()
-					.getAllItems(null, null, zones, null, facility, fromTime.toString(), toTime.toString());
 
+                // if multiple EPC prefixes are specified, multiple ItemSense calls are required
+		if (epcPrefixList == null) {
+			Collection <Item>myitems = itemSenseConnection.getItemApiLib().showAllItems(null);
+			items.addAll(myitems);
 		} else {
 			// loop through the EPC prefixes
 			for (String epcPrefixFilter : epcPrefixList ) {
 				// loop through the epcFilters since ItemSense only takes one at a time
-				ArrayList <Item> filteredItems = itemSenseConnection
-						.getDataController()
+				Collection <Item> filteredItems = itemSenseConnection.getDataController()
 						.getItemController()
 						.getAllItems(null, epcPrefixFilter, zones, null, facility, fromTime.toString(), toTime.toString());
 				items.addAll(filteredItems);
@@ -69,12 +70,17 @@ public class ItemSenseQueryHelper {
 				" fromTime: " + fromTime + " toTime: " + toTime + " }");
 		return items;
 	}
+*/
 
-	public ArrayList<Item> getStepThroughFilteredItems(ItemSenseConnection itemSenseConnection,
+	public Collection<Item> getStepThroughFilteredItems(ItemSenseConnection itemSenseConnection,
 	                                               EpcFormat epcFormat, String facility, String zones, String epcPrefixes,
 	                                               ZonedDateTime fromTime, ZonedDateTime toTime ) {
 		// get All Items
-		ArrayList <Item> items = getAllItems(itemSenseConnection, null);
+		LOGGER.debug("getStepThroughFilteredItems: " + itemSenseConnection + 
+				" FILTERED BY { epcPrefix(s): " + epcPrefixes +
+				" zones: " + zones + " facility: " + facility +
+				" fromTime: " + fromTime + " toTime: " + toTime + " }");
+		Collection <Item> items = getAllItems(itemSenseConnection, null);
 
 		// Filter Items by epcPrefix
 		items = filterItemsByPrefixes(items, epcPrefixes);
@@ -97,18 +103,17 @@ public class ItemSenseQueryHelper {
 	 * @return
 	 */
 
-	public ArrayList <Item> getAllItems(ItemSenseConnection itemSenseConnection, EpcFormat epcFormat) {
+	public Collection <Item> getAllItems(ItemSenseConnection itemSenseConnection, EpcFormat epcFormat) {
 
-		ArrayList <Item> items = itemSenseConnection
-			.getDataController()
-			.getItemController()
-				.getAllItems (epcFormat);
+		Collection <Item> items = itemSenseConnection
+			//.getItemApiLib().showAllItems(epcFormat);
+			.getItemApiLib().showAllItems(null);
 		LOGGER.debug("ItemSenseConnection: " + itemSenseConnection + "  Returned item count: " + items.size() + " with NO filters applied");
 		return items;
 	}
 
 	// Filter Items by epcPrefix
-	public ArrayList <Item> filterItemsByPrefixes(ArrayList<Item> items, String epcPrefixes) {
+	public Collection <Item> filterItemsByPrefixes(Collection<Item> items, String epcPrefixes) {
 		LOGGER.debug("Before filtering by Prefix(s): " + epcPrefixes + " itemCount: " + items.size());
 		if (epcPrefixes == null || epcPrefixes.trim().length () == 0) {
 			LOGGER.info ("No epc prefix filters specified.  No prefix filter applied.");
@@ -123,16 +128,16 @@ public class ItemSenseQueryHelper {
 					.collect(Collectors.toCollection (ArrayList::new));
 
 
-			LOGGER.debug ("Item count for epcPrefix: " + epcPrefix + " is : " + itemsPerFilter.size ());
+			LOGGER.debug ("     Item count for epcPrefix: " + epcPrefix + " is : " + itemsPerFilter.size ());
 
 			filteredItems.addAll (itemsPerFilter);
 		}
-		LOGGER.debug("Item count after filtering by Prefix(s): " + epcPrefixes + " itemCount: " + items.size());
+		LOGGER.debug("After filtering by prefix(s): " + epcPrefixes + " itemCount: " + filteredItems.size());
 		return filteredItems;
 	}
 
 	// Filter Items by to/from times
-	public ArrayList <Item> filterItemsByTime(ArrayList<Item> items, ZonedDateTime fromTime,ZonedDateTime toTime) {
+	public Collection <Item> filterItemsByTime(Collection<Item> items, ZonedDateTime fromTime,ZonedDateTime toTime) {
 		// validate the fromTime is before the toTime
 		LOGGER.debug ("Before filtering by fromTime: " + fromTime + " toTime: " + toTime + " itemCount: " + items.size ());
 		if (toTime == null && fromTime == null) {
@@ -151,7 +156,7 @@ public class ItemSenseQueryHelper {
 	}
 
 	// Filter Items by facility
-	public ArrayList<Item> filterItemsByFacility(ArrayList<Item> items, String facility) {
+	public Collection<Item> filterItemsByFacility(Collection<Item> items, String facility) {
 
 		LOGGER.debug("Before filtering by facility: " + facility + " itemCount: " + items.size());
 		if (facility == null || facility.trim().length () == 0) {
@@ -167,7 +172,7 @@ public class ItemSenseQueryHelper {
 		return items;
 	}
 
-	public ArrayList<Item> filterItemsByZones(ArrayList<Item> items, String zones) {
+	public Collection<Item> filterItemsByZones(Collection<Item> items, String zones) {
 		// Filter Items by zones
 		LOGGER.debug("Before filtering by zones: " + zones + " itemCount: " + items.size());
 		if (zones == null || zones.trim().length () == 0) {

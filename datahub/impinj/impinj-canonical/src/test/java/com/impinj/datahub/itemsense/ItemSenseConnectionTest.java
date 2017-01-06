@@ -2,13 +2,13 @@ package com.impinj.datahub.itemsense;
 
 import com.impinj.datahub.constants.ImpinjDatahubConstants;
 
-import com.impinj.itemsense.client.coordinator.CoordinatorApiController;
-import com.impinj.itemsense.client.data.DataApiController;
-import com.impinj.itemsense.client.coordinator.job.JobController;
-import com.impinj.itemsense.client.coordinator.job.JobResponse;
-import com.impinj.itemsense.client.coordinator.readerhealth.ReaderStatus;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
+//import com.impinj.itemsense.client.coordinator.CoordinatorApiController;
+//import com.impinj.itemsense.client.data.DataApiController;
+//import com.impinj.itemsense.client.coordinator.job.JobController;
+//import com.impinj.itemsense.client.coordinator.job.JobResponse;
+//import com.impinj.itemsense.client.coordinator.readerhealth.ReaderStatus;
+import com.impinj.itemsense.client.coordinator.ControlApiLib;
+import com.impinj.itemsense.client.data.ItemApiLib;
 
 
 import org.junit.Before;
@@ -46,6 +46,7 @@ public class ItemSenseConnectionTest
 	}
 
 
+/*
 	@Test
 	public void getConnectionCoordinatorControllerTest() {
 
@@ -70,8 +71,10 @@ public class ItemSenseConnectionTest
 	    assertNotNull ("jobResponseList", jobResponseList);
 
 	}
+*/
 
 
+/*
 	@Test
 	public void getConnectionDataControllerTest() {
 
@@ -83,6 +86,13 @@ public class ItemSenseConnectionTest
 	    assertTrue ("data api controller", dac!=null);
 
 	}
-
+*/
+       @Test
+       public void getItemApiLibTest () {
+           ItemSenseConnection isConnection = new ItemSenseConnection ( url, userName, password);
+       	   ItemApiLib ial = isConnection.getItemApiLib();
+	   assertNotNull ("ItemApiLib", ial);
+	   assertTrue ("ItemApiLib", ial!=null);
+       }
 }
 

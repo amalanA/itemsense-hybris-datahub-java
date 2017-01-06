@@ -17,12 +17,14 @@ public class ItemSenseJobHelper {
 	}
 
 	public boolean isJobRunning(ItemSenseConnection itemSenseConnection, String facility) {
+return true;
 
 //		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ()
 //				.stream ()
 //				.filter (jr -> jr.getStatus ().equals (JobStatus.RUNNING))
 //				.collect (Collectors.toList ());
 
+/*
 		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ();
 
 		if (jobResponseList == null || jobResponseList.size () == 0) {
@@ -52,5 +54,6 @@ public class ItemSenseJobHelper {
 
 		// Nothing matched so a job must not be running in the correct facility...
 		return false;
+*/
 	}
 }
