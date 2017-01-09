@@ -166,7 +166,7 @@ public class ItemSenseQueryHelper {
 
 		items = items
 				.stream()
-				.filter(i -> i.getFacility ().equalsIgnoreCase (facility))
+				.filter(i -> facility.equalsIgnoreCase(i.getFacility ()))
 			    .collect(Collectors.toCollection (ArrayList::new));
 		LOGGER.debug("After filtering by facility: " + facility + " itemCount: " + items.size());
 		return items;
@@ -187,7 +187,7 @@ public class ItemSenseQueryHelper {
 			ArrayList itemsPerFilter = new ArrayList <Item> ();
 			itemsPerFilter = items
 					.stream ()
-					.filter (item -> item.getZone ().equalsIgnoreCase (zone))
+					.filter (item -> zone.equalsIgnoreCase(item.getZone ()))
 					.collect(Collectors.toCollection (ArrayList::new));
 
 			LOGGER.debug ("Item count for zone: " + zone + " is : " + itemsPerFilter.size ());
