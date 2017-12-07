@@ -3,9 +3,7 @@ package com.impinj.itemsense.client.coordinator.job;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.impinj.itemsense.client.coordinator.facility.Facility;
-
 import java.time.ZonedDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobResponse {
+
     private String id;
     private String status;
     private String [] readerNames;

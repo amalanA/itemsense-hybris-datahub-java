@@ -1,7 +1,7 @@
 package com.impinj.datahub.itemsense;
 
 import com.impinj.itemsense.client.coordinator.facility.Facility;
-import com.impinj.itemsense.client.coordinator.job.JobResponse;
+//import com.impinj.itemsense.client.coordinator.job.JobResponse;
 import com.impinj.itemsense.client.coordinator.job.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +19,13 @@ public class ItemSenseJobHelper {
 	public boolean isJobRunning(ItemSenseConnection itemSenseConnection, String facility) {
 return true;
 
-//		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ()
-//				.stream ()
-//				.filter (jr -> jr.getStatus ().equals (JobStatus.RUNNING))
-//				.collect (Collectors.toList ());
+// Don't try to manage jobs for demo
+/*		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ()
+				.stream ()
+				.filter (jr -> jr.getStatus ().equals (JobStatus.RUNNING))
+				.collect (Collectors.toList ());
 
-/*
+
 		List<JobResponse> jobResponseList = itemSenseConnection.getCoordinatorController ().getJobController ().getJobs ();
 
 		if (jobResponseList == null || jobResponseList.size () == 0) {
