@@ -31,6 +31,7 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	private static ApplicationContext applicationContext;
 	private MessageChannel rawFragmentDataInputChannel;
 	private ItemSenseConnection itemSenseConnection;
+	private ItemSenseConnection itemSenseConnection2;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImpinjScheduledJob.class);
 
@@ -56,6 +57,10 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME),
 				dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD)));
 
+		setItemSenseConnection2( new ItemSenseConnection (
+				dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL+"2"),
+				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME+"2"),
+				dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD+"2")));
 		// validate a job is running.  If not, log as a warning and do not update any data
 
 		ItemSenseJobHelper jobHelper = new ItemSenseJobHelper ();
@@ -76,7 +81,9 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_EPC_PREFIX),
 						dataMap.getLongFromString(ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS),
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY),
-						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES)
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY+"2"),
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES),
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES+"2")
 						);
 				rawFragmentDataInputChannel.send(new GenericMessage(rawData));
 			}
@@ -87,7 +94,7 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	 */
 	protected List<RawFragmentData> createRawDataFromImpinj(final String feedName, final String type, final String warehouse,
 			final String hybrisMasterDataFile, final String epcPrefix, final long lookbackWindowInSeconds,
-            final String facility, final String zones)
+            final String facility, final String facility2, final String zones, final String zones2)
 	{
 		final List<RawFragmentData> result = new ArrayList<>();
 		RawFragmentData rawFragmentData;
@@ -95,9 +102,15 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 		ZonedDateTime fromTime = TimeHelper.getFromTimeByLookbackWindow (toTime, lookbackWindowInSeconds);
 
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
-		final Collection<Item> items = isQueryHelper.getStepThroughFilteredItems (getItemSenseConnection (),
+		final Collection<Item> allItems = isQueryHelper.getStepThroughFilteredItems (getItemSenseConnection (),
 				null, facility, zones, epcPrefix, fromTime, toTime);
 		LOGGER.info("ItemSense (filtered) reported item count: " + items.size());
+
+		final Collection<Item> itemsToRemove = isQueryHelper.getStepThroughFilteredItems (getItemSenseConnection2 (),
+				null, facility2, zones2, epcPrefix, fromTime, toTime);
+		LOGGER.info("ItemSense (filtered) reported local item count: " + items.size());
+
+		final Collection <Item> items = rationalizeItemsBetweenItemSenses( allItems, itemsToRemove );
 
 		final HashMap<String, Integer> hybrisInventoryCount = ProductStockLevel.getMasterDataStockLevelsFromItems(
 				hybrisMasterDataFile, items);
@@ -149,5 +162,38 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	public void setItemSenseConnection(final ItemSenseConnection itemSenseConnection)
 	{
 		this.itemSenseConnection = itemSenseConnection;
+	}
+	/**
+	 * @return the second itemsenseConfiguration
+	 */
+	public ItemSenseConnection getItemSenseConnection2()
+	{
+		return itemSenseConnection2;
+	}
+
+	/**
+	 * @param itemSenseConnection the itemsenseConfiguration to set
+	 */
+	public void setItemSenseConnection2(final ItemSenseConnection itemSenseConnection2)
+	{
+		this.itemSenseConnection2 = itemSenseConnection2;
+	}
+
+	/** HACK to let rationalize items from 2 itemsenses.  If item is in itemsToRemove, and item is in allItems, remove it
+	 *  because it is in one of the local zones that takes it out of online ATP
+	 *
+	 * @param allItems
+	 * @param itemsToRemove
+	 * @return
+	 */
+	protected Collection <Item> rationalizeItemsBetweenItemSenses( Collection <Item> allItems, Collection <Item> itemsToRemove ) {
+		itemsToRemove.forEach(itemToRemove -> {
+			allItems.forEach(item -> {
+				if (item.getEpc().equals(itemToRemove.getEpc())) {
+					allItems.remove(item);
+				}
+			});
+		});
+		return allItems;
 	}
 }
