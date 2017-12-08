@@ -33,6 +33,10 @@ public class ImpinjScheduledJobTest
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ENDPOINT_URL),
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_USERNAME),
 					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_PASSWORD)));
+			impinjJob.setItemSenseConnection2 ( new ItemSenseConnection (
+					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ENDPOINT_URL2),
+					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_USERNAME2),
+					config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_PASSWORD2)));
 
 		}
 		catch (final IOException e)
@@ -57,7 +61,9 @@ public class ImpinjScheduledJobTest
 			final String epcPrefixes = config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_EPC_PREFIX);
 			final String lookbackWindowInSeconds = config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS);
 			final String facility = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_FACILITY);
+			final String facility2 = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_FACILITY2);
 		        final String zones = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ZONES);
+		        final String zones2 = config.getProperty (ImpinjDatahubConstants.CONFIG_JOBS + ".1." + ImpinjDatahubConstants.CONFIG_ZONES2);
 
 
 System.out.println ("test rawItems: feedname: " + feedName);
@@ -68,6 +74,8 @@ System.out.println ("test rawItems: epcPrefixes: " + epcPrefixes);
 System.out.println ("test rawItems: lookbackWindowInSeconds: " + lookbackWindowInSeconds);
 System.out.println ("test rawItems: facility: " + facility);
 System.out.println ("test rawItems: zones: " + zones);
+System.out.println ("test rawItems: facility2: " + facility2);
+System.out.println ("test rawItems: zones2: " + zones2);
 			rawItems = impinjJob.createRawDataFromImpinj(
 					feedName,
 					type,
@@ -76,7 +84,9 @@ System.out.println ("test rawItems: zones: " + zones);
 					epcPrefixes,
 					Integer.parseInt(lookbackWindowInSeconds),
 					facility,
-					zones);
+					facility2,
+					zones,
+					zones2);
 			assertNotNull(rawItems);
 
 			// could eventually get zero items from itemsense.

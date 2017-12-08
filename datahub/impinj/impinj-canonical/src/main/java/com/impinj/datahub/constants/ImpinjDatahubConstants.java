@@ -11,15 +11,20 @@ public class ImpinjDatahubConstants
 	public final static String PROPERTIES_FILENAME = "config.properties";
 	public final static String CONFIG_JOBS = "jobs";
 	public final static String CONFIG_CRON_EXPRESSION = "cronexpression";
-	public final static String CONFIG_USERNAME = "username";
-	public final static String CONFIG_PASSWORD = "password";
 	public final static String CONFIG_WAREHOUSE = "warehouse";
-	public final static String CONFIG_ENDPOINT_URL = "endpointurl";
 	public final static String CONFIG_MASTER_DATA_FILE = "hybrismasterdatapath";
 	public final static String CONFIG_LOOKBACK_WINDOW_IN_SECONDS = "itemlookbackwindowinseconds";
 	public final static String CONFIG_EPC_PREFIX = "epcprefix";
+	public final static String CONFIG_USERNAME = "username";
+	public final static String CONFIG_PASSWORD = "password";
+	public final static String CONFIG_ENDPOINT_URL = "endpointurl";
 	public final static String CONFIG_FACILITY = "facility";
 	public final static String CONFIG_ZONES = "zones";
+	public final static String CONFIG_USERNAME2 = "username2";
+	public final static String CONFIG_PASSWORD2 = "password2";
+	public final static String CONFIG_ENDPOINT_URL2 = "endpointurl2";
+	public final static String CONFIG_FACILITY2 = "facility2";
+	public final static String CONFIG_ZONES2 = "zones2";
 
 	/**
 	 * Datahub constants.

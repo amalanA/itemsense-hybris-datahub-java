@@ -52,6 +52,18 @@ public class ImpinjSchedulerFactoryBean extends SchedulerFactoryBean
 									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
 											+ ImpinjDatahubConstants.CONFIG_ENDPOINT_URL))
 							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_USERNAME2,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_USERNAME2))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_PASSWORD2,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_PASSWORD2))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_ENDPOINT_URL2,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_ENDPOINT_URL2))
+							.usingJobData(
 									ImpinjDatahubConstants.CONFIG_EPC_PREFIX,
 									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
 											+ ImpinjDatahubConstants.CONFIG_EPC_PREFIX))
@@ -75,6 +87,14 @@ public class ImpinjSchedulerFactoryBean extends SchedulerFactoryBean
 									ImpinjDatahubConstants.CONFIG_ZONES,
 									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
 											+ ImpinjDatahubConstants.CONFIG_ZONES))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_FACILITY2,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_FACILITY2))
+							.usingJobData(
+									ImpinjDatahubConstants.CONFIG_ZONES2,
+									config.getProperty(ImpinjDatahubConstants.CONFIG_JOBS + "." + i + "."
+											+ ImpinjDatahubConstants.CONFIG_ZONES2))
 							.build();
 
 					final Trigger trigger = TriggerBuilder

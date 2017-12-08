@@ -51,16 +51,18 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 		final JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
 		LOGGER.info("Impinj Data Hub job is running: Job " + jobKey.getName());
+                String url = dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL);
+                String itemsenseUserName = dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME);
+                String itemsensePassword = dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD);
+		LOGGER.info("+++++++ItemSenseConnection1: URL: " + url + " isUsername: " + itemsenseUserName + " isPassword: " + itemsensePassword);
+		setItemSenseConnection( new ItemSenseConnection ( url, itemsenseUserName, itemsensePassword));
 
-		setItemSenseConnection( new ItemSenseConnection (
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL),
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME),
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD)));
+                url = dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL2);
+                itemsenseUserName = dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME2);
+                itemsensePassword = dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD2);
+		LOGGER.info("+++++++ItemSenseConnection2: URL: " + url + " isUsername: " + itemsenseUserName + " isPassword: " + itemsensePassword);
+		setItemSenseConnection2( new ItemSenseConnection ( url, itemsenseUserName, itemsensePassword));
 
-		setItemSenseConnection2( new ItemSenseConnection (
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_ENDPOINT_URL+"2"),
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_USERNAME+"2"),
-				dataMap.getString(ImpinjDatahubConstants.CONFIG_PASSWORD+"2")));
 		// validate a job is running.  If not, log as a warning and do not update any data
 
 		ItemSenseJobHelper jobHelper = new ItemSenseJobHelper ();
@@ -81,9 +83,9 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_EPC_PREFIX),
 						dataMap.getLongFromString(ImpinjDatahubConstants.CONFIG_LOOKBACK_WINDOW_IN_SECONDS),
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY),
-						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY+"2"),
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_FACILITY2),
 						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES),
-						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES+"2")
+						dataMap.getString(ImpinjDatahubConstants.CONFIG_ZONES2)
 						);
 				rawFragmentDataInputChannel.send(new GenericMessage(rawData));
 			}
@@ -104,11 +106,11 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 		ItemSenseQueryHelper isQueryHelper = new ItemSenseQueryHelper ();
 		final Collection<Item> allItems = isQueryHelper.getStepThroughFilteredItems (getItemSenseConnection (),
 				null, facility, zones, epcPrefix, fromTime, toTime);
-		LOGGER.info("ItemSense (filtered) reported item count: " + items.size());
+		LOGGER.info("ItemSense (filtered) reported item count: " + allItems.size());
 
 		final Collection<Item> itemsToRemove = isQueryHelper.getStepThroughFilteredItems (getItemSenseConnection2 (),
 				null, facility2, zones2, epcPrefix, fromTime, toTime);
-		LOGGER.info("ItemSense (filtered) reported local item count: " + items.size());
+		LOGGER.info("ItemSense (filtered) reported local item count: " + itemsToRemove.size());
 
 		final Collection <Item> items = rationalizeItemsBetweenItemSenses( allItems, itemsToRemove );
 
