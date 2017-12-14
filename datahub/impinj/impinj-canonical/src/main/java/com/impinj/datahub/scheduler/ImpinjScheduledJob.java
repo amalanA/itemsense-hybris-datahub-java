@@ -189,13 +189,18 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	 * @return
 	 */
 	protected Collection <Item> rationalizeItemsBetweenItemSenses( Collection <Item> allItems, Collection <Item> itemsToRemove ) {
-		itemsToRemove.forEach(itemToRemove -> {
-			allItems.forEach(item -> {
-				if (item.getEpc().equals(itemToRemove.getEpc())) {
-					allItems.remove(item);
-				}
-			});
-		});
+                if (itemsToRemove != null && itemsToRemove.size() >0) {
+                   if (allItems != null && allItems.size() >0) {
+
+		    itemsToRemove.forEach(itemToRemove -> {
+			    allItems.forEach(item -> {
+				    if (item.getEpc().equals(itemToRemove.getEpc())) {
+					    allItems.remove(item);
+				    }
+			    });
+		    });
+                }
+                }
 		return allItems;
 	}
 }

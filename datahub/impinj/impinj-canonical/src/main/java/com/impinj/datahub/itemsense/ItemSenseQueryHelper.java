@@ -140,6 +140,7 @@ public class ItemSenseQueryHelper {
 	public Collection <Item> filterItemsByTime(Collection<Item> items, ZonedDateTime fromTime,ZonedDateTime toTime) {
 		// validate the fromTime is before the toTime
 		LOGGER.debug ("Before filtering by fromTime: " + fromTime + " toTime: " + toTime + " itemCount: " + items.size ());
+		LOGGER.debug ("Items: " + items);
 		if (toTime == null && fromTime == null) {
 			LOGGER.info ("No lookback window specified. No time filter applied");
 			return items;
