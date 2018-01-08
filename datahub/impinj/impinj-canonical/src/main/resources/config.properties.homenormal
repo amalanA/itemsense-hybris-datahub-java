@@ -6,20 +6,20 @@ jobs=1
 
 ## every 5 seconds ##
 jobs.1.cronexpression=0/5 * * * * ?
-jobs.1.hybrismasterdatapath=/home/isadmin/hybris-mods/nrf2018-masterdata.txt 
+jobs.1.hybrismasterdatapath=/home/isadmin/demo/connector/itemsense-hybris-datahub-java/datahub/impinj/impinj-canonical/src/main/resources/ColumbiaMasterData.txt
 jobs.1.itemlookbackwindowinseconds=805
 jobs.1.epcprefix=30300
 jobs.1.username=admin
 jobs.1.password=admindefault
 jobs.1.warehouse=ap_warehouse_e
-jobs.1.endpointurl=http://192.168.0.83/itemsense
+jobs.1.endpointurl=http://192.168.0.90/itemsense
 jobs.1.facility=Impinj-Olympia
-jobs.1.zones=Office
+jobs.1.zones=xArray-11-41-75
 jobs.1.username2=admin
 jobs.1.password2=admindefault
-jobs.1.endpointurl2=http://192.168.0.90/itemsense
+jobs.1.endpointurl2=http://192.168.0.93/itemsense
 jobs.1.facility2=Impinj-Olympia
-jobs.1.zones2=PickAndPack
+jobs.1.zones2=PickAndPack,fit,POS
 
 ## every 10 seconds ##
 #jobs.2.cronexpression=0/10 * * * * ?
