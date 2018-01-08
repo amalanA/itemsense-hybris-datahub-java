@@ -6,7 +6,7 @@ jobs=1
 
 ## every 5 seconds ##
 jobs.1.cronexpression=0/5 * * * * ?
-jobs.1.hybrismasterdatapath=/home/isadmin/hybris-mods/nrf2018-masterdata.txt 
+jobs.1.hybrismasterdatapath=/home/isadmin//nrf/connector/itemsense-hybris-datahub-java/datahub/impinj/impinj-canonical/src/main/resources/nrf2018-masterdata.txt 
 jobs.1.itemlookbackwindowinseconds=805
 jobs.1.epcprefix=30300
 jobs.1.username=admin

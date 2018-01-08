@@ -189,18 +189,37 @@ public class ImpinjScheduledJob implements Job, ApplicationContextAware
 	 * @return
 	 */
 	protected Collection <Item> rationalizeItemsBetweenItemSenses( Collection <Item> allItems, Collection <Item> itemsToRemove ) {
-                if (itemsToRemove != null && itemsToRemove.size() >0) {
-                   if (allItems != null && allItems.size() >0) {
 
-		    itemsToRemove.forEach(itemToRemove -> {
-			    allItems.forEach(item -> {
-				    if (item.getEpc().equals(itemToRemove.getEpc())) {
-					    allItems.remove(item);
-				    }
-			    });
-		    });
+ 		if (allItems == null || allItems.size() == 0) {
+                   return allItems;
                 }
+                if (itemsToRemove == null ||  itemsToRemove.size() == 0) {
+                   return allItems;
                 }
+
+		LOGGER.debug("size of all items before rationalizing: " + allItems.size());
+		LOGGER.debug("size of all items to remove before rationalizing: " + itemsToRemove.size());
+  		// old school - iterators
+                // If it matches a remove item, remove it, and remove it from the remove list 
+                Iterator itemItr = allItems.iterator();
+                while (itemItr.hasNext()) {
+                    Item item = (Item) itemItr.next();
+                    Iterator removeItr = itemsToRemove.iterator();
+                    while (removeItr.hasNext()) {
+                        Item itemToRemove = (Item) removeItr.next();
+		//LOGGER.debug("rationalizing: item EPC: " + item.getEpc());
+		//LOGGER.debug("rationalizing: remove EPC: " + itemToRemove.getEpc());
+		        if (item.getEpc().equals(itemToRemove.getEpc())) {
+    			    itemItr.remove();
+    			    removeItr.remove();
+		LOGGER.debug("rationalizing: removing EPC " +item.getEpc() +" from inventory");
+                            break;
+		        }
+		    }
+                }
+		LOGGER.debug("size of all items after rationalizing: " + allItems.size());
+		LOGGER.debug("size of all items to remove after rationalizing: " + itemsToRemove.size());
 		return allItems;
+
 	}
 }
